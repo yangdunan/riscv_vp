@@ -2,7 +2,7 @@
 
 #include <tlm_utils/simple_target_socket.h>
 #include <systemc>
-
+#include<scml2.h>
 #include "core/common/irq_if.h"
 #include "util/memory_map.h"
 #include "util/tlm_map.h"

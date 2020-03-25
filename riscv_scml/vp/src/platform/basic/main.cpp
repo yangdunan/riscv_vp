@@ -164,9 +164,11 @@ int sc_main(int argc, char **argv) {
 	tlm::tlm_global_quantum::instance().set(sc_core::sc_time(opt.tlm_global_quantum, sc_core::SC_NS));
 
 	ISS core(0, opt.use_E_base_isa);
-	SimpleMemory mem("SimpleMemory", opt.mem_size);
+	//SimpleMemory mem("SimpleMemory", opt.mem_size);
+	MemoryModel<unsigned char> mem("SimpleMemory", opt.mem_size,sc_time(10, SC_NS),sc_time(10, SC_NS));
+	
 	ELFLoader loader(opt.input_program.c_str());
-	SimpleBus<1, 5> bus("SimpleBus");// NR_OF_INITIATORS=3, NR_OF_TARGETS=6
+	SimpleBus<1, 4> bus("SimpleBus");// NR_OF_INITIATORS=3, NR_OF_TARGETS=6
 	CombinedMemoryInterface iss_mem_if("MemoryInterface", core);
 	SyscallHandler sys("SyscallHandler");
 	FE310_PLIC<1, 64, 96, 32> plic("PLIC");//NumberCores,NumberInterrupts,NumberInterruptEntries,MaxPriority
@@ -203,21 +205,20 @@ int sc_main(int argc, char **argv) {
 		core.sys = &sys;
 
 	// address mapping
-	bus.ports[0] = new PortMapping(opt.mem_start_addr, opt.mem_end_addr);//mem 0x00000000~0x001FFFFFF
-	bus.ports[1] = new PortMapping(opt.clint_start_addr, opt.clint_end_addr);//clint 0x02000000~0x0200ffff
-	bus.ports[2] = new PortMapping(opt.plic_start_addr, opt.plic_end_addr);//plic 0x40000000~0x41000000
-
-	bus.ports[3] = new PortMapping(opt.display_start_addr, opt.display_end_addr);
-	bus.ports[4] = new PortMapping(opt.sys_start_addr, opt.sys_end_addr);
-
+	//bus.ports[0] = new PortMapping(opt.mem_start_addr, opt.mem_end_addr);//mem 0x00000000~0x001FFFFFF
+	bus.ports[0] = new PortMapping(opt.clint_start_addr, opt.clint_end_addr);//clint 0x02000000~0x0200ffff
+	bus.ports[1] = new PortMapping(opt.plic_start_addr, opt.plic_end_addr);//plic 0x40000000~0x41000000
+	bus.ports[2] = new PortMapping(opt.display_start_addr, opt.display_end_addr);
+	bus.ports[3] = new PortMapping(opt.sys_start_addr, opt.sys_end_addr);
+	Bus.map(opt.mem_start_addr, opt.mem_size, mem.memory_bank, 0);
 	// connect TLM sockets
 	iss_mem_if.isock.bind(bus.tsocks[0]);
 
-	bus.isocks[0].bind(mem.tsock);
-	bus.isocks[1].bind(clint.tsock);
-	bus.isocks[2].bind(plic.tsock);
-	bus.isocks[3].bind(display.tsock);
-	bus.isocks[4].bind(sys.tsock);
+	//bus.isocks[0].bind(mem.tsock);
+	bus.isocks[0].bind(clint.tsock);
+	bus.isocks[1].bind(plic.tsock);
+	bus.isocks[2].bind(display.tsock);
+	bus.isocks[3].bind(sys.tsock);
 
 	// connect interrupt signals/communication
 	plic.target_harts[0] = &core;

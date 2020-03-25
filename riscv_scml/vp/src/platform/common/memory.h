@@ -1,6 +1,62 @@
 #ifndef RISCV_ISA_MEMORY_H
 #define RISCV_ISA_MEMORY_H
 
+#include <systemc>
+// #include <tlm>
+#include <scml2.h>
+
+
+template <typename T>
+class MemoryModel : public sc_module {
+public:
+	/* Port list */
+	// tlm::tlm_target_socket<32> t_socket;
+
+	/* Memory bank */
+	scml2::memory<T> memory_bank;
+	
+	
+	uint8_t *data;
+	uint32_t size;
+	//bool read_only;
+	
+	
+	/* Constructor */
+	SC_HAS_PROCESS(MemoryModel);
+	MemoryModel(const sc_module_name &name,
+	            unsigned long long size,
+	            const sc_time &read_latency = sc_time(0, SC_NS),
+	            const sc_time &write_latency = sc_time(0, SC_NS));
+
+	/* Destructor */
+	~MemoryModel();
+
+private:
+	/* Memory bank */
+	// scml2::memory<T> memory_bank;
+
+	/* Port adapter */
+	// scml2::tlm2_gp_target_adapter<32> t_adapter;
+};
+
+#endif /*MEMORY_MODEL_H*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 #include <stdint.h>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <iostream>
@@ -12,7 +68,7 @@
 
 struct SimpleMemory : public sc_core::sc_module {
 	tlm_utils::simple_target_socket<SimpleMemory> tsock;
-
+	
 	uint8_t *data;
 	uint32_t size;
 	bool read_only;
@@ -80,3 +136,4 @@ struct SimpleMemory : public sc_core::sc_module {
 };
 
 #endif  // RISCV_ISA_MEMORY_H
+*/
