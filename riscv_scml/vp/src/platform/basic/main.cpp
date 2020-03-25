@@ -1,6 +1,6 @@
 #include <cstdlib>
 #include <ctime>
-
+#include <systemc.h>
 #include "basic_timer.h"
 #include "core/common/clint.h"
 #include "display.hpp"
@@ -24,7 +24,10 @@
 #include <boost/program_options.hpp>
 #include <iomanip>
 #include <iostream>
+/*	scml bus	*/
 
+#include <scml2.h>
+//#include <scml.h>
 using namespace rv32;
 
 struct Options {
@@ -169,6 +172,9 @@ int sc_main(int argc, char **argv) {
 	FE310_PLIC<1, 64, 96, 32> plic("PLIC");//NumberCores,NumberInterrupts,NumberInterruptEntries,MaxPriority
 	CLINT<1> clint("CLINT");//NumberOfCores
 	Display display("Display");
+	/*scml bus*/
+	scml2::router<uint> Bus("Bus", 0x100000000);
+
 
 	MemoryDMI dmi = MemoryDMI::create_start_size_mapping(mem.data, opt.mem_start_addr, mem.size);
 	InstrMemoryProxy instr_mem(dmi, core);

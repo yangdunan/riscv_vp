@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(riscv-vp)
 
+set(SCML_ROOT $ENV{SCML_HOME})
+set(SCML_INCLUDE64_DIR ${SCML_ROOT}/include)
+
+set(SCML_LIB64_DIR -L${SCML_ROOT}/lib-linux64)
+set(SCML_LIBRARIES scml)
+
+
 option(USE_SYSTEM_SYSTEMC "use systemc version provided by the system" OFF)
 
 if(NOT CMAKE_BUILD_TYPE)
